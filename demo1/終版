@@ -117,8 +117,7 @@ int main(){
     }
     auto end=high_resolution_clock::now();
     double time=duration<double, micro>(end-start).count();
-    
-    cout<<"\n排序結果:\n";
+
     printAll(data);
     
     cout<<"\ntime:"<<time/1000.0<<" ms"<<endl;
