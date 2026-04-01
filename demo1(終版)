@@ -1,0 +1,127 @@
+#include <iostream>
+#include <vector>
+#include <cstdlib>
+#include <ctime>
+#include <chrono>
+
+using namespace std;
+using namespace chrono;
+
+vector<int> generateData(int n){
+    vector<int> data;
+    for(int i=0; i<n; i++){
+        data.push_back(rand()%50000+1);
+    }
+    return data;
+}
+
+int partition(vector<int>& arr, int left, int right){
+    int pivot=arr[right];
+    int i=left-1;
+    
+    for(int j=left; j<right; j++){
+        if(arr[j]<pivot){
+            i++;
+            swap(arr[i], arr[j]);
+        }
+    }
+    swap(arr[i+1], arr[right]);
+    return i+1;
+}
+
+//quicksort
+void quickSort(vector<int>& arr, int left, int right){
+    if(left<right){
+        int pi=partition(arr, left, right);
+        quickSort(arr, left, pi-1);
+        quickSort(arr, pi+1, right);
+    }
+}
+
+//mergesort
+void merge(vector<int>& arr, int l, int m, int n){
+    vector<int> left(arr.begin()+l, arr.begin()+m+1);
+    vector<int> right(arr.begin()+m+1, arr.begin()+n+1);
+    
+    int i=0, j=0, k=l;
+    
+    while(i<left.size()&&j<right.size()){
+        if(left[i]<right[j]) arr[k++]=left[i++];
+        else arr[k++]=right[j++];
+    }
+    while(i<left.size()) arr[k++]=left[i++];
+    while(j<right.size()) arr[k++]=right[j++];
+}
+
+void mergeSort(vector<int>& arr, int l, int r){
+    if(l<r){
+        int m=(l+r)/2;
+        mergeSort(arr, l, m);
+        mergeSort(arr, m+1, r);
+        merge(arr, l, m, r);
+    }
+}
+
+//heapsort
+void adjust(vector<int>&a, int root, int n){
+    int e=a[root];
+    int j;
+    
+    for(j=2*root+1; j<n; j=2*j+1){
+        
+        if(j+1<n && a[j]<a[j+1]) j++;
+        if(e>=a[j]) break;
+        a[root]=a[j];
+        root=j;
+    }
+    a[root]=e;
+}
+
+void heapSort(vector<int>& a){
+    int n=a.size();
+    for(int i=n/2-1; i>=0; i--){
+        adjust(a, i, n);
+    }
+    for(int i=n-1; i>0; i--){
+        swap(a[0], a[i]);
+        adjust(a, 0, i);
+    }
+}
+
+void printAll(const vector<int>& arr){
+    for(int i=0; i<arr.size(); i++){
+        cout<<arr[i]<<" ";
+    }
+    cout<<endl;
+}
+
+int main(){
+    srand(time(0));
+    int n, choice;
+    
+    cout<<"n個數字:";
+    cin>>n;
+    
+    cout<<"Choose Sort(1.Quick Sort, 2.Merge Sort, Heap Sort):\n";
+    cin>>choice;
+    
+    vector<int> data=generateData(n);
+    auto start=high_resolution_clock::now();
+    
+    if(choice==1){quickSort(data, 0, n-1);}
+    else if(choice==2){mergeSort(data, 0, n-1);}
+    else if(choice==3){heapSort(data);}
+    else{
+        cout<<"error\n";
+        return 0;
+    }
+    auto end=high_resolution_clock::now();
+    double time=duration<double, micro>(end-start).count();
+    
+    cout<<"\n排序結果:\n";
+    printAll(data);
+    
+    cout<<"\ntime:"<<time/1000.0<<" ms"<<endl;
+    
+    return 0;
+}
